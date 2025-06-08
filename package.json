@@ -1,0 +1,32 @@
+{
+  "name": "budget-lens-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx watch src/app.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maucalil/budget-lens-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/maucalil/budget-lens-api/issues"
+  },
+  "homepage": "https://github.com/maucalil/budget-lens-api#readme",
+  "devDependencies": {
+    "@types/node": "^22.15.30",
+    "prisma": "^6.9.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.9.0",
+    "fastify": "^5.3.3",
+    "zod": "^3.25.56"
+  }
+}

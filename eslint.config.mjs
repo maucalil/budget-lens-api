@@ -16,12 +16,10 @@ export default tseslint.config(
         'warn',
         { allowExpressions: true },
       ],
-
       'no-var': 'error',
       'prefer-const': 'error',
       eqeqeq: ['error', 'always'],
       'no-implicit-coercion': 'error',
-      'no-console': 'warn',
       'require-await': 'error',
     },
   }

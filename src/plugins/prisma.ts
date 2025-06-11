@@ -13,6 +13,7 @@ const prismaPlugin: FastifyPluginAsync = async (fastify: FastifyInstance) => {
 
   await prisma.$connect().catch(error => {
     fastify.log.error(`${error.message}`);
+    throw error;
   });
   fastify.log.info('Prisma client connected');
 

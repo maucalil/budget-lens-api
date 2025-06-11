@@ -20,7 +20,6 @@ export default tseslint.config(
       'prefer-const': 'error',
       eqeqeq: ['error', 'always'],
       'no-implicit-coercion': 'error',
-      'require-await': 'error',
     },
   }
 );

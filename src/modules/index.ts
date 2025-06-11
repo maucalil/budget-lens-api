@@ -4,8 +4,8 @@ import categoryModule from './category';
 
 const modules: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   await Promise.all([
-    fastify.register(transactionModule),
     fastify.register(categoryModule),
+    fastify.register(transactionModule),
   ]);
 };
 

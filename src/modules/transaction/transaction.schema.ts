@@ -1,4 +1,7 @@
-import { TRANSACTION_LIMITS } from '@utils/constants/limits';
+import {
+  TRANSACTION_FILTER_LIMITS,
+  TRANSACTION_LIMITS,
+} from '@utils/constants/limits';
 import { PaymentMethodEnum } from '@utils/enums/payment-method';
 import { TransactionTypeEnum } from '@utils/enums/transaction-type';
 import { z } from 'zod/v4';
@@ -38,6 +41,32 @@ export const TransactionParamsSchema = z.object({
   id: z.coerce.number(),
 });
 
+export const TransactionFilterSchema = z
+  .object({
+    month: z.coerce
+      .number()
+      .int()
+      .min(TRANSACTION_FILTER_LIMITS.MONTH_MIN)
+      .max(TRANSACTION_FILTER_LIMITS.MONTH_MAX)
+      .optional(),
+    year: z.coerce
+      .number()
+      .int()
+      .min(TRANSACTION_FILTER_LIMITS.YEAR_MIN)
+      .max(TRANSACTION_FILTER_LIMITS.YEAR_MAX)
+      .optional(),
+    maxResults: z.coerce
+      .number()
+      .int()
+      .min(TRANSACTION_FILTER_LIMITS.RESULTS_MIN)
+      .max(TRANSACTION_FILTER_LIMITS.RESULTS_MAX)
+      .optional(),
+  })
+  .refine(data => data.month === undefined || data.year !== undefined, {
+    message: 'Year is required if month is provided.',
+    path: ['year'],
+  });
+
 export const TransactionCreateSchema = z.object(TransactionInput);
 export const TransactionUpdateSchema = z.object(TransactionInput).partial();
 
@@ -48,6 +77,7 @@ export const TransactionResSchema = z.object({
 export const TransactionsResSchema = z.array(TransactionResSchema);
 
 export type TransactionParams = z.infer<typeof TransactionParamsSchema>;
+export type TransactionFilter = z.infer<typeof TransactionFilterSchema>;
 export type TransactionCreateInput = z.infer<typeof TransactionCreateSchema>;
 export type TransactionUpdateInput = z.infer<typeof TransactionUpdateSchema>;
 
@@ -59,3 +89,6 @@ z.globalRegistry.add(TransactionUpdateSchema, {
 });
 z.globalRegistry.add(TransactionResSchema, { id: 'TransactionResSchema' });
 z.globalRegistry.add(TransactionsResSchema, { id: 'TransactionsResSchema' });
+z.globalRegistry.add(TransactionFilterSchema, {
+  id: 'TransactionFilterSchema',
+});

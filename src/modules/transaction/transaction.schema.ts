@@ -1,17 +1,11 @@
-import {
-  TRANSACTION_FILTER_LIMITS,
-  TRANSACTION_LIMITS,
-} from '@utils/constants/limits';
+import { TRANSACTION_FILTER_LIMITS, TRANSACTION_LIMITS } from '@utils/constants/limits';
 import { PaymentMethodEnum } from '@utils/enums/payment-method';
 import { TransactionTypeEnum } from '@utils/enums/transaction-type';
 import { z } from 'zod/v4';
 import { Decimal } from '@prisma/client/runtime/library';
 
 const TransactionInput = {
-  name: z
-    .string()
-    .min(TRANSACTION_LIMITS.NAME_MIN_LENGTH)
-    .max(TRANSACTION_LIMITS.NAME_MAX_LENGTH),
+  name: z.string().min(TRANSACTION_LIMITS.NAME_MIN_LENGTH).max(TRANSACTION_LIMITS.NAME_MAX_LENGTH),
   amount: z.preprocess(val => {
     if (typeof val === 'string' || typeof val === 'number') {
       return new Decimal(val);

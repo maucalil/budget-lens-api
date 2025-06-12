@@ -12,10 +12,7 @@ import {
 export class TransactionController {
   constructor(private service: TransactionService) {}
 
-  public getTransactions = async (
-    request: FastifyRequest,
-    reply: FastifyReply
-  ): Promise<void> => {
+  public getTransactions = async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
     const filters = TransactionFilterSchema.parse(request.query);
     const transactions = await this.service.getTransactions(filters);
     const parsedTransaction = TransactionsResSchema.parse(transactions);

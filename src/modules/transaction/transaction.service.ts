@@ -1,24 +1,16 @@
 import { Transaction, PrismaClient, Prisma } from '@prisma/client';
-import {
-  TransactionCreateInput,
-  TransactionFilter,
-  TransactionUpdateInput,
-} from './transaction.schema';
+import { TransactionCreateInput, TransactionFilter, TransactionUpdateInput } from './transaction.schema';
 import { NotFoundError } from '@utils/errors';
 import { TRANSACTION_FILTER_LIMITS } from '@utils/index';
 
 export class TransactionService {
   constructor(private prisma: PrismaClient) {}
 
-  public async createTransaction(
-    data: TransactionCreateInput
-  ): Promise<Transaction> {
+  public async createTransaction(data: TransactionCreateInput): Promise<Transaction> {
     return this.prisma.transaction.create({ data });
   }
 
-  public async getTransactions(
-    filters?: TransactionFilter
-  ): Promise<Transaction[]> {
+  public async getTransactions(filters?: TransactionFilter): Promise<Transaction[]> {
     const { month, year, maxResults } = filters || {};
     const { startDate, endDate } = this.getDateRange(month, year);
     const where: Prisma.TransactionWhereInput = {};
@@ -49,20 +41,14 @@ export class TransactionService {
     return transaction;
   }
 
-  public async updateTransaction(
-    id: number,
-    data: TransactionUpdateInput
-  ): Promise<Transaction> {
+  public async updateTransaction(id: number, data: TransactionUpdateInput): Promise<Transaction> {
     try {
       return await this.prisma.transaction.update({
         where: { id },
         data,
       });
     } catch (err) {
-      if (
-        err instanceof Prisma.PrismaClientKnownRequestError &&
-        err.code === 'P2025'
-      ) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
         throw new NotFoundError('Transaction to update not found.');
       }
       throw err;
@@ -75,20 +61,14 @@ export class TransactionService {
         where: { id },
       });
     } catch (err) {
-      if (
-        err instanceof Prisma.PrismaClientKnownRequestError &&
-        err.code === 'P2025'
-      ) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
         throw new NotFoundError('Transaction to delete not found.');
       }
       throw err;
     }
   }
 
-  private getDateRange(
-    month?: number,
-    year?: number
-  ): { startDate?: Date; endDate?: Date } {
+  private getDateRange(month?: number, year?: number): { startDate?: Date; endDate?: Date } {
     const getStartDate = (y: number, m: number): Date => new Date(y, m - 1, 1);
     const getEndDate = (y: number, m: number): Date => new Date(y, m, 0);
 

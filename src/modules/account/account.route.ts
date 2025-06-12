@@ -8,10 +8,7 @@ import {
   AccountsResSchema,
   AccountUpdateSchema,
 } from './account.schema';
-import {
-  createSuccessResponseSchema,
-  SimpleErrorResponseSchema,
-} from '@utils/zod';
+import { createSuccessResponseSchema, SimpleErrorResponseSchema } from '@utils/zod';
 import { z } from 'zod/v4';
 
 const accountRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {

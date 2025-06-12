@@ -16,17 +16,12 @@ export function createSuccessResponseSchema<T extends z.ZodType>(
 }
 
 export const ErrorIssueSchema = z.object({
-  path: z
-    .array(z.union([z.string(), z.number()]))
-    .describe('The path to the invalid field.'),
+  path: z.array(z.union([z.string(), z.number()])).describe('The path to the invalid field.'),
   message: z.string(),
 });
 
 export const SimpleErrorResponseSchema = z.object({
   success: z.literal(false),
   message: z.string(),
-  issues: z
-    .array(ErrorIssueSchema)
-    .optional()
-    .describe('Optional list of specific validation issues.'),
+  issues: z.array(ErrorIssueSchema).optional().describe('Optional list of specific validation issues.'),
 });

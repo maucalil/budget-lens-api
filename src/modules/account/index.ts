@@ -1,10 +1,10 @@
-import { FastifyPluginAsync } from "fastify";
-import accountRoutes from "./account.route";
+import { FastifyPluginAsync } from 'fastify';
+import accountRoutes from './account.route';
 
-const accountModule: FastifyPluginAsync = async (fastify) => {
+const accountModule: FastifyPluginAsync = async fastify => {
   fastify.register(accountRoutes, {
-    prefix: "/account",
+    prefix: '/account',
   });
-}
+};
 
 export default accountModule;

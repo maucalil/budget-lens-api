@@ -1,8 +1,5 @@
 import { Account, Prisma, PrismaClient } from '@prisma/client';
-import {
-  AccountCreateInput,
-  AccountUpdateInput,
-} from './account.schema';
+import { AccountCreateInput, AccountUpdateInput } from './account.schema';
 
 export class AccountService {
   constructor(private prisma: PrismaClient) {}
@@ -27,20 +24,14 @@ export class AccountService {
     return this.prisma.account.create({ data });
   }
 
-  public async updateAccount(
-    id: number,
-    data: AccountUpdateInput
-  ): Promise<Account> {
+  public async updateAccount(id: number, data: AccountUpdateInput): Promise<Account> {
     try {
       return await this.prisma.account.update({
         where: { id },
         data,
       });
     } catch (err) {
-      if (
-        err instanceof Prisma.PrismaClientKnownRequestError &&
-        err.code === 'P2025'
-      ) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
         throw new Error('Account to update not found.');
       }
       throw err;
@@ -53,10 +44,7 @@ export class AccountService {
         where: { id },
       });
     } catch (err) {
-      if (
-        err instanceof Prisma.PrismaClientKnownRequestError &&
-        err.code === 'P2025'
-      ) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
         throw new Error('Account to delete not found.');
       }
       throw err;

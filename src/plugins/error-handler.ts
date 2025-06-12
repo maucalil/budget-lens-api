@@ -16,9 +16,7 @@ function wrapError(message: string, issues?: unknown[]): ErrorResponse {
   };
 }
 
-const errorHandlerPlugin: FastifyPluginAsync = async (
-  fastify: FastifyInstance
-): Promise<void> => {
+const errorHandlerPlugin: FastifyPluginAsync = async (fastify: FastifyInstance): Promise<void> => {
   fastify.setErrorHandler((error: FastifyError, request, reply): void => {
     console.log('ERROR CONSTRUCTOR:', error.constructor.name);
     console.log(error);
@@ -32,12 +30,8 @@ const errorHandlerPlugin: FastifyPluginAsync = async (
     }
 
     if (error.code === 'FST_ERR_VALIDATION' && error.validation) {
-      const issues = (
-        error.validation as { instancePath: string; message?: string }[]
-      ).map(issue => ({
-        path: issue.instancePath
-          ? issue.instancePath.substring(1).split('/')
-          : [],
+      const issues = (error.validation as { instancePath: string; message?: string }[]).map(issue => ({
+        path: issue.instancePath ? issue.instancePath.substring(1).split('/') : [],
         message: issue.message || 'Invalid input',
       }));
       reply.status(400).send(wrapError('Input validation failed', issues));

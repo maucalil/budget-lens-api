@@ -9,15 +9,10 @@ import {
   TransactionsResSchema,
   TransactionUpdateSchema,
 } from './transaction.schema';
-import {
-  createSuccessResponseSchema,
-  SimpleErrorResponseSchema,
-} from '@utils/zod';
+import { createSuccessResponseSchema, SimpleErrorResponseSchema } from '@utils/zod';
 import { z } from 'zod/v4';
 
-const transactionRoutes: FastifyPluginAsync = async (
-  fastify: FastifyInstance
-) => {
+const transactionRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   const transactionService = new TransactionService(fastify.prisma);
   const transactionController = new TransactionController(transactionService);
   const tags = ['Transactions'];

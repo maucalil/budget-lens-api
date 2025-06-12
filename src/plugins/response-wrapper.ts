@@ -16,12 +16,8 @@ declare module 'fastify' {
   }
 }
 
-const responseWrapperPlugin: FastifyPluginAsync = async (
-  fastify: FastifyInstance
-): Promise<void> => {
-  fastify.decorateReply('sendSuccess', function <
-    T,
-  >(this: FastifyReply, data: T): FastifyReply {
+const responseWrapperPlugin: FastifyPluginAsync = async (fastify: FastifyInstance): Promise<void> => {
+  fastify.decorateReply('sendSuccess', function <T>(this: FastifyReply, data: T): FastifyReply {
     return this.send(wrapSuccess(data));
   });
 };

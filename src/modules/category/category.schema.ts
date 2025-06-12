@@ -3,9 +3,7 @@ import { CATEGORY_LIMITS } from '@utils/constants/limits';
 import { z } from 'zod/v4';
 
 const CategoryCore = {
-  name: z
-    .string()
-    .max(CATEGORY_LIMITS.NAME_MAX_LENGTH, CATEGORY_ERRORS.NAME_MAX_LENGTH),
+  name: z.string().max(CATEGORY_LIMITS.NAME_MAX_LENGTH, CATEGORY_ERRORS.NAME_MAX_LENGTH),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
 };
 

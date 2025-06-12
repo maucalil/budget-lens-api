@@ -3,9 +3,7 @@ import { TransactionService } from './transaction.service';
 import {
   TransactionCreateInput,
   TransactionParams,
-  TransactionRes,
   TransactionResSchema,
-  TransactionsRes,
   TransactionsResSchema,
   TransactionUpdateInput,
 } from './transaction.schema';
@@ -13,35 +11,45 @@ import {
 export class TransactionController {
   constructor(private service: TransactionService) {}
 
-  public createTransaction = async (
-    request: FastifyRequest<{ Body: TransactionCreateInput }>
-  ): Promise<TransactionRes> => {
-    const transaction = await this.service.createTransaction(request.body);
-    return TransactionResSchema.parse(transaction);
-  };
-
-  public getTransactions = async (): Promise<TransactionsRes> => {
+  public getTransactions = async (
+    _request: FastifyRequest,
+    reply: FastifyReply
+  ): Promise<void> => {
     const transactions = await this.service.getTransactions();
-    return TransactionsResSchema.parse(transactions);
+    const parsedTransaction = TransactionsResSchema.parse(transactions);
+    reply.code(200).sendSuccess(parsedTransaction);
   };
 
   public getTransaction = async (
-    request: FastifyRequest<{ Params: TransactionParams }>
-  ): Promise<TransactionRes> => {
+    request: FastifyRequest<{ Params: TransactionParams }>,
+    reply: FastifyReply
+  ): Promise<void> => {
     const { id } = request.params;
     const transaction = await this.service.getTransactionById(id);
-    return TransactionResSchema.parse(transaction);
+    const parsedTransaction = TransactionResSchema.parse(transaction);
+    reply.code(200).sendSuccess(parsedTransaction);
+  };
+
+  public createTransaction = async (
+    request: FastifyRequest<{ Body: TransactionCreateInput }>,
+    reply: FastifyReply
+  ): Promise<void> => {
+    const transaction = await this.service.createTransaction(request.body);
+    const parsedTransaction = TransactionResSchema.parse(transaction);
+    reply.code(201).sendSuccess(parsedTransaction);
   };
 
   public updateTransaction = async (
     request: FastifyRequest<{
       Params: TransactionParams;
       Body: TransactionUpdateInput;
-    }>
-  ): Promise<TransactionRes> => {
+    }>,
+    reply: FastifyReply
+  ): Promise<void> => {
     const { id } = request.params;
     const transaction = await this.service.updateTransaction(id, request.body);
-    return TransactionResSchema.parse(transaction);
+    const parsedTransaction = TransactionResSchema.parse(transaction);
+    reply.code(200).sendSuccess(parsedTransaction);
   };
 
   public deleteTransaction = async (

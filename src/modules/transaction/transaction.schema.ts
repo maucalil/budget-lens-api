@@ -50,8 +50,6 @@ export const TransactionsResSchema = z.array(TransactionResSchema);
 export type TransactionParams = z.infer<typeof TransactionParamsSchema>;
 export type TransactionCreateInput = z.infer<typeof TransactionCreateSchema>;
 export type TransactionUpdateInput = z.infer<typeof TransactionUpdateSchema>;
-export type TransactionRes = z.infer<typeof TransactionResSchema>;
-export type TransactionsRes = z.infer<typeof TransactionsResSchema>;
 
 z.globalRegistry.add(TransactionCreateSchema, {
   id: 'TransactionCreateSchema',

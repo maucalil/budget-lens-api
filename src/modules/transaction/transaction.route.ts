@@ -35,6 +35,22 @@ const transactionRoutes: FastifyPluginAsync = async (
     transactionController.getTransactions
   );
 
+  fastify.get(
+    '/:id',
+    {
+      schema: {
+        tags,
+        description: 'Get a single transaction by its ID',
+        params: TransactionParamsSchema,
+        response: {
+          200: createSuccessResponseSchema(TransactionResSchema),
+          404: SimpleErrorResponseSchema,
+        },
+      },
+    },
+    transactionController.getTransaction
+  );
+
   fastify.post(
     '/',
     {
@@ -50,22 +66,6 @@ const transactionRoutes: FastifyPluginAsync = async (
       },
     },
     transactionController.createTransaction
-  );
-
-  fastify.get(
-    '/:id',
-    {
-      schema: {
-        tags,
-        description: 'Get a single transaction by its ID',
-        params: TransactionParamsSchema,
-        response: {
-          200: createSuccessResponseSchema(TransactionResSchema),
-          404: SimpleErrorResponseSchema,
-        },
-      },
-    },
-    transactionController.getTransaction
   );
 
   fastify.put(

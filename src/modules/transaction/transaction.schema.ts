@@ -1,24 +1,13 @@
 import { TRANSACTION_FILTER_LIMITS, TRANSACTION_LIMITS } from '@utils/constants/limits';
 import { PaymentMethodEnum } from '@utils/enums/payment-method';
 import { TransactionTypeEnum } from '@utils/enums/transaction-type';
+import { zDate, zDecimal } from '@utils/zod';
 import { z } from 'zod/v4';
-import { Decimal } from '@prisma/client/runtime/library';
 
 const TransactionInput = {
   name: z.string().min(TRANSACTION_LIMITS.NAME_MIN_LENGTH).max(TRANSACTION_LIMITS.NAME_MAX_LENGTH),
-  amount: z.preprocess(val => {
-    if (typeof val === 'string' || typeof val === 'number') {
-      return new Decimal(val);
-    }
-    return val;
-  }, z.instanceof(Decimal)),
-
-  date: z.preprocess(val => {
-    if (typeof val === 'string' || val instanceof Date) {
-      return new Date(val);
-    }
-    return val;
-  }, z.date()),
+  amount: zDecimal,
+  date: zDate,
   type: TransactionTypeEnum,
   paymentMethod: PaymentMethodEnum,
   accountId: z.number(),

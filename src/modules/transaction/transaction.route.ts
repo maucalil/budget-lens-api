@@ -3,6 +3,7 @@ import { TransactionService } from './transaction.service';
 import { TransactionController } from './transaction.controller';
 import {
   TransactionCreateSchema,
+  TransactionFilterSchema,
   TransactionParamsSchema,
   TransactionResSchema,
   TransactionsResSchema,
@@ -27,6 +28,7 @@ const transactionRoutes: FastifyPluginAsync = async (
       schema: {
         tags,
         description: 'List all transactions',
+        querystring: TransactionFilterSchema,
         response: {
           200: createSuccessResponseSchema(TransactionsResSchema),
         },

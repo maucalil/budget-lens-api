@@ -1,9 +1,11 @@
 import { Transaction, PrismaClient, Prisma } from '@prisma/client';
 import {
   TransactionCreateInput,
+  TransactionFilter,
   TransactionUpdateInput,
 } from './transaction.schema';
 import { NotFoundError } from '@utils/errors';
+import { TRANSACTION_FILTER_LIMITS } from '@utils/index';
 
 export class TransactionService {
   constructor(private prisma: PrismaClient) {}
@@ -14,8 +16,25 @@ export class TransactionService {
     return this.prisma.transaction.create({ data });
   }
 
-  public async getTransactions(): Promise<Transaction[]> {
-    return this.prisma.transaction.findMany();
+  public async getTransactions(
+    filters?: TransactionFilter
+  ): Promise<Transaction[]> {
+    const { month, year, maxResults } = filters || {};
+    const { startDate, endDate } = this.getDateRange(month, year);
+    const where: Prisma.TransactionWhereInput = {};
+
+    if (startDate && endDate) {
+      where.date = {
+        gte: startDate,
+        lte: endDate,
+      };
+    }
+
+    return this.prisma.transaction.findMany({
+      take: maxResults,
+      where,
+      orderBy: { date: 'desc' },
+    });
   }
 
   public async getTransactionById(id: number): Promise<Transaction> {
@@ -64,5 +83,26 @@ export class TransactionService {
       }
       throw err;
     }
+  }
+
+  private getDateRange(
+    month?: number,
+    year?: number
+  ): { startDate?: Date; endDate?: Date } {
+    const getStartDate = (y: number, m: number): Date => new Date(y, m - 1, 1);
+    const getEndDate = (y: number, m: number): Date => new Date(y, m, 0);
+
+    if (month && year) {
+      return {
+        startDate: getStartDate(year, month),
+        endDate: getEndDate(year, month),
+      };
+    } else if (year) {
+      return {
+        startDate: getStartDate(year, TRANSACTION_FILTER_LIMITS.MONTH_MIN),
+        endDate: getEndDate(year, TRANSACTION_FILTER_LIMITS.MONTH_MAX),
+      };
+    }
+    return {};
   }
 }

@@ -7,7 +7,7 @@ const modules: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   await Promise.all([
     fastify.register(categoryModule),
     fastify.register(transactionModule),
-    fastify.register(accountModule)
+    fastify.register(accountModule),
   ]);
 };
 

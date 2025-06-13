@@ -20,3 +20,10 @@ export const TRANSACTION_FILTER_LIMITS = {
   RESULTS_MIN: 1,
   RESULTS_MAX: 100,
 };
+
+export const ANALYTICS_LIMITS = {
+  MONTH_MIN: 1,
+  MONTH_MAX: 12,
+  YEAR_MIN: 2020,
+  YEAR_MAX: 2100,
+};

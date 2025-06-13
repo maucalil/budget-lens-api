@@ -1,14 +1,14 @@
-import { PrismaClient } from '@prisma/client';
-import { AnalyticsCashFlowReqSchema, AnalyticsCashFlowResSchema } from './analytics.schema';
+import { $Enums, PrismaClient } from '@prisma/client';
+import { AnalyticsCashFlowQuery, AnalyticsCashFlowRes } from './analytics.schema';
 import { Decimal } from '@prisma/client/runtime/library';
+import { getDateRange } from '@utils/date';
 
 export class AnalyticsService {
   constructor(private prisma: PrismaClient) {}
 
-  public async getAnalyticsCashFlow(dateFilter: AnalyticsCashFlowReqSchema): Promise<AnalyticsCashFlowResSchema> {
-    const { month, year } = dateFilter;
-    const startDate = new Date(year, month - 1, 1);
-    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+  public async getAnalyticsCashFlow(query: AnalyticsCashFlowQuery): Promise<AnalyticsCashFlowRes> {
+    const { month, year } = query;
+    const { startDate, endDate } = getDateRange(month, year);
 
     const result = await this.prisma.transaction.groupBy({
       by: ['type'],
@@ -26,8 +26,8 @@ export class AnalyticsService {
     let income: Decimal = new Decimal(0);
     let expense: Decimal = new Decimal(0);
     for (const group of result) {
-      if (group.type === 'INCOME') income = group._sum.amount ?? new Decimal(0);
-      else if (group.type === 'EXPENSE') expense = group._sum.amount ?? new Decimal(0);
+      if (group.type === $Enums.TransactionType.INCOME) income = group._sum.amount ?? new Decimal(0);
+      else if (group.type === $Enums.TransactionType.EXPENSE) expense = group._sum.amount ?? new Decimal(0);
     }
 
     const balance = income.minus(expense);

@@ -9,7 +9,7 @@ const modules: FastifyPluginAsync = async (fastify: FastifyInstance) => {
     fastify.register(categoryModule),
     fastify.register(transactionModule),
     fastify.register(accountModule),
-    fastify.register(analyticsModule), 
+    fastify.register(analyticsModule),
   ]);
 };
 

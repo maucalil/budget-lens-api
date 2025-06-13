@@ -1,11 +1,11 @@
-import { ANALYTICS_LIMITS } from '@utils/index';
+import { DATE_LIMITS } from '@utils/constants/limits';
 import { zDecimal } from '@utils/zod';
 import { z } from 'zod/v4';
 
-export const AnalyticsCashFlowReqSchema = z
+export const AnalyticsCashFlowQuerySchema = z
   .object({
-    month: z.coerce.number().int().min(ANALYTICS_LIMITS.MONTH_MIN).max(ANALYTICS_LIMITS.MONTH_MAX),
-    year: z.coerce.number().int().min(ANALYTICS_LIMITS.YEAR_MIN).max(ANALYTICS_LIMITS.YEAR_MAX),
+    month: z.coerce.number().int().min(DATE_LIMITS.MONTH_MIN).max(DATE_LIMITS.MONTH_MAX),
+    year: z.coerce.number().int().min(DATE_LIMITS.YEAR_MIN).max(DATE_LIMITS.YEAR_MAX),
   })
   .refine(data => data.month === undefined || data.year !== undefined, {
     message: 'Year is required if month is provided.',
@@ -18,11 +18,11 @@ export const AnalyticsCashFlowResSchema = z.object({
   balance: zDecimal,
 });
 
-export type AnalyticsCashFlowResSchema = z.infer<typeof AnalyticsCashFlowResSchema>;
-export type AnalyticsCashFlowReqSchema = z.infer<typeof AnalyticsCashFlowReqSchema>;
+export type AnalyticsCashFlowQuery = z.infer<typeof AnalyticsCashFlowQuerySchema>;
+export type AnalyticsCashFlowRes = z.infer<typeof AnalyticsCashFlowResSchema>;
 
-z.globalRegistry.add(AnalyticsCashFlowReqSchema, {
-  id: 'CashFlowReqSchema',
+z.globalRegistry.add(AnalyticsCashFlowQuerySchema, {
+  id: 'AnalyticsCashFlowQuerySchema',
 });
 z.globalRegistry.add(AnalyticsCashFlowResSchema, {
   id: 'AnalyticsCashFlowResSchema',

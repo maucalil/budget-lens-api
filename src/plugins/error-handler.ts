@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { AppError } from '@utils/errors';
 import { FastifyInstance, FastifyPluginAsync, FastifyError } from 'fastify';
 import fp from 'fastify-plugin';
@@ -27,6 +28,20 @@ const errorHandlerPlugin: FastifyPluginAsync = async (fastify: FastifyInstance):
 
       reply.status(error.statusCode).send(wrapError(error.message));
       return;
+    }
+
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2003') {
+        reply
+          .status(400)
+          .send(wrapError(`Foreign key constraint violated. Invalid or missing '${error.meta?.constraint}'`));
+        return;
+      }
+
+      if (error.code === 'P2025') {
+        reply.status(404).send(wrapError(`${error.meta?.modelName}: ${error.meta?.cause}`));
+        return;
+      }
     }
 
     if (error.code === 'FST_ERR_VALIDATION' && error.validation) {

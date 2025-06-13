@@ -1,13 +1,23 @@
-import { Transaction, PrismaClient, Prisma } from '@prisma/client';
+import { Transaction, PrismaClient, Prisma, $Enums } from '@prisma/client';
 import { TransactionCreateInput, TransactionFilter, TransactionUpdateInput } from './transaction.schema';
 import { NotFoundError } from '@utils/errors';
 import { TRANSACTION_FILTER_LIMITS } from '@utils/index';
+import { Decimal } from '@prisma/client/runtime/library';
 
 export class TransactionService {
   constructor(private prisma: PrismaClient) {}
 
   public async createTransaction(data: TransactionCreateInput): Promise<Transaction> {
-    return this.prisma.transaction.create({ data });
+    return await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      const createdTransaction = await tx.transaction.create({ data });
+
+      await tx.account.update({
+        where: { id: createdTransaction.accountId },
+        data: { amount: { increment: this.getSignedAmount(createdTransaction) } },
+      });
+
+      return createdTransaction;
+    });
   }
 
   public async getTransactions(filters?: TransactionFilter): Promise<Transaction[]> {
@@ -30,9 +40,7 @@ export class TransactionService {
   }
 
   public async getTransactionById(id: number): Promise<Transaction> {
-    const transaction = await this.prisma.transaction.findUnique({
-      where: { id },
-    });
+    const transaction = await this.prisma.transaction.findUnique({ where: { id } });
 
     if (!transaction) {
       throw new NotFoundError('Transaction not found.');
@@ -42,30 +50,54 @@ export class TransactionService {
   }
 
   public async updateTransaction(id: number, data: TransactionUpdateInput): Promise<Transaction> {
-    try {
-      return await this.prisma.transaction.update({
+    return await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      const oldTransaction = await tx.transaction.findUnique({ where: { id } });
+      if (!oldTransaction) throw new NotFoundError('Transaction to update not found.');
+
+      const updatedTransaction = await tx.transaction.update({
         where: { id },
         data,
       });
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
-        throw new NotFoundError('Transaction to update not found.');
+
+      const oldAmount = this.getSignedAmount(oldTransaction);
+      const newAmount = this.getSignedAmount(updatedTransaction);
+      const amountDelta = newAmount.minus(oldAmount);
+
+      const accountUpdates = [];
+
+      if (updatedTransaction.accountId !== oldTransaction.accountId) {
+        accountUpdates.push(
+          tx.account.update({
+            where: { id: oldTransaction.accountId },
+            data: { amount: { increment: oldAmount.negated() } },
+          })
+        );
       }
-      throw err;
-    }
+
+      accountUpdates.push(
+        tx.account.update({
+          where: { id: updatedTransaction.accountId },
+          data: { amount: { increment: amountDelta } },
+        })
+      );
+
+      await Promise.all(accountUpdates);
+
+      return updatedTransaction;
+    });
   }
 
   public async deleteTransaction(id: number): Promise<Transaction> {
-    try {
-      return await this.prisma.transaction.delete({
-        where: { id },
+    return await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      const deletedTransaction = await tx.transaction.delete({ where: { id } });
+
+      await tx.account.update({
+        where: { id: deletedTransaction.accountId },
+        data: { amount: { increment: this.getSignedAmount(deletedTransaction).negated() } },
       });
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
-        throw new NotFoundError('Transaction to delete not found.');
-      }
-      throw err;
-    }
+
+      return deletedTransaction;
+    });
   }
 
   private getDateRange(month?: number, year?: number): { startDate?: Date; endDate?: Date } {
@@ -84,5 +116,9 @@ export class TransactionService {
       };
     }
     return {};
+  }
+
+  private getSignedAmount(transaction: Pick<Transaction, 'amount' | 'type'>): Decimal {
+    return transaction.type === $Enums.TransactionType.INCOME ? transaction.amount : transaction.amount.negated();
   }
 }

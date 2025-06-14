@@ -9,10 +9,16 @@ type TransactionMonthlyAggreagation = {
   total: Decimal;
 };
 
+type CategoryExpenses = {
+  categoryName: string;
+  categoryColor: string;
+  total: Decimal;
+};
+
 export class AnalyticsService {
   constructor(private prisma: PrismaClient) {}
 
-  public async getAnalyticsCashFlow(query: AnalyticsQuery): Promise<AnalyticsCashFlow> {
+  public async getCashFlow(query: AnalyticsQuery): Promise<AnalyticsCashFlow> {
     const { month, year } = query;
     const { startDate, endDate } = getDateRange(year, month);
 
@@ -46,7 +52,7 @@ export class AnalyticsService {
     return { income, expense, balance };
   }
 
-  public async getAnalyticsIncomeExpense(query: AnalyticsQuery): Promise<AnalyticsChart> {
+  public async getMonthlyIncomeExpense(query: AnalyticsQuery): Promise<AnalyticsChart> {
     const { month, year } = query;
 
     const result = await this.prisma.$queryRaw<TransactionMonthlyAggreagation[]>(
@@ -66,6 +72,29 @@ export class AnalyticsService {
     );
 
     return this.buildMonthlyIncomeExpenseChartData(result, year);
+  }
+
+  public async getExpensesByCategory(query: AnalyticsQuery): Promise<AnalyticsChart> {
+    const { month, year } = query;
+
+    const result = await this.prisma.$queryRaw<CategoryExpenses[]>(
+      Prisma.sql`
+        SELECT
+          c.name AS "categoryName",
+          c.color AS "categoryColor",
+          SUM(t."amount") AS total
+        FROM "Transaction" t
+        JOIN "Category" c ON c.id = t."categoryId"
+        WHERE t."type" = 'EXPENSE'
+          AND EXTRACT(YEAR FROM t."date") = ${year}
+          AND EXTRACT(MONTH FROM t."date") = ${month}
+        GROUP BY c.name, c.color;
+      `,
+      year,
+      month
+    );
+
+    return this.buildExpensesByCategoryChartData(result);
   }
 
   private buildMonthlyIncomeExpenseChartData(result: TransactionMonthlyAggreagation[], year: number): AnalyticsChart {
@@ -107,6 +136,24 @@ export class AnalyticsService {
         { label: 'Income', data: incomeData },
         { label: 'Expense', data: expenseData },
       ],
+    };
+  }
+
+  private buildExpensesByCategoryChartData(result: CategoryExpenses[]): AnalyticsChart {
+    const labels: string[] = [];
+    const data: Decimal[] = [];
+    const backgroundColor: string[] = [];
+
+    for (const row of result) {
+      const total = new Decimal(row.total);
+      labels.push(row.categoryName);
+      backgroundColor.push(row.categoryColor);
+      data.push(total);
+    }
+
+    return {
+      labels,
+      datasets: [{ data, backgroundColor }],
     };
   }
 }

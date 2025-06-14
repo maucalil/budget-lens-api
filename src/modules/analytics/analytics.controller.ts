@@ -5,17 +5,24 @@ import { AnalyticsQuerySchema, AnalyticsCashFlowSchema, AnalyticsChartSchema } f
 export class AnalyticsController {
   constructor(private service: AnalyticsService) {}
 
-  public getAnalyticsCashFlow = async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
+  public getCashFlow = async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
     const query = AnalyticsQuerySchema.parse(request.query);
-    const cashFlow = await this.service.getAnalyticsCashFlow(query);
+    const cashFlow = await this.service.getCashFlow(query);
     const parsedCashFlow = AnalyticsCashFlowSchema.parse(cashFlow);
     reply.code(200).sendSuccess(parsedCashFlow);
   };
 
-  public getAnalyticsIncomeExpense = async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
+  public getMonthlyIncomeExpense = async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
     const query = AnalyticsQuerySchema.parse(request.query);
-    const incomeExpense = await this.service.getAnalyticsIncomeExpense(query);
-    const parsedIncomeExpense = AnalyticsChartSchema.parse(incomeExpense);
-    reply.code(200).sendSuccess(parsedIncomeExpense);
+    const monthlyIncomeExpense = await this.service.getMonthlyIncomeExpense(query);
+    const parsedMonthlyIncomeExpense = AnalyticsChartSchema.parse(monthlyIncomeExpense);
+    reply.code(200).sendSuccess(parsedMonthlyIncomeExpense);
+  };
+
+  public getExpensesByCategory = async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
+    const query = AnalyticsQuerySchema.parse(request.query);
+    const expensesByCategory = await this.service.getExpensesByCategory(query);
+    const parsedExpensesByCategory = AnalyticsChartSchema.parse(expensesByCategory);
+    reply.code(200).sendSuccess(parsedExpensesByCategory);
   };
 }

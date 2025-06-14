@@ -14,29 +14,46 @@ const analyticsRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => 
     {
       schema: {
         tags,
-        description: 'Get the total income, expenses, and balance for a specified month',
+        description: 'Get the total income, expenses, and balance for a given month',
         querystring: AnalyticsQuerySchema,
         response: {
           200: createSuccessResponseSchema(AnalyticsCashFlowSchema),
         },
       },
     },
-    analyticsController.getAnalyticsCashFlow
+    analyticsController.getCashFlow
   );
 
   fastify.get(
-    '/income-expense',
+    '/monthly-income-expense',
     {
       schema: {
         tags,
-        description: 'Retrieves monthly aggregated data of total income and expenses to be used for generating a chart',
+        description:
+          'Retrieves monthly aggregated data of total income and expenses, formatted for chart visualization',
         querystring: AnalyticsQuerySchema,
         response: {
           200: createSuccessResponseSchema(AnalyticsChartSchema),
         },
       },
     },
-    analyticsController.getAnalyticsIncomeExpense
+    analyticsController.getMonthlyIncomeExpense
+  );
+
+  fastify.get(
+    '/expenses-by-category',
+    {
+      schema: {
+        tags,
+        description:
+          'Retrieves the total expenses by category for a given month and year, formatted for chart visualization',
+        querystring: AnalyticsQuerySchema,
+        response: {
+          200: createSuccessResponseSchema(AnalyticsChartSchema),
+        },
+      },
+    },
+    analyticsController.getExpensesByCategory
   );
 };
 

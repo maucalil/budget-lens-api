@@ -24,6 +24,7 @@ export const AnalyticsChartSchema = z.object({
     z.object({
       data: z.array(zDecimal),
       label: z.string().optional(),
+      backgroundColor: z.array(z.string()).optional(),
     })
   ),
 });

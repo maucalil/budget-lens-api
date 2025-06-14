@@ -1,3 +1,10 @@
+export const DATE_LIMITS = {
+  MONTH_MIN: 1,
+  MONTH_MAX: 12,
+  YEAR_MIN: 2020,
+  YEAR_MAX: 2100,
+};
+
 export const ACCOUNT_LIMITS = {
   NAME_MIN_LENGTH: 3,
   NAME_MAX_LENGTH: 50,
@@ -13,10 +20,6 @@ export const TRANSACTION_LIMITS = {
 };
 
 export const TRANSACTION_FILTER_LIMITS = {
-  MONTH_MIN: 1,
-  MONTH_MAX: 12,
-  YEAR_MIN: 2020,
-  YEAR_MAX: 2100,
   RESULTS_MIN: 1,
   RESULTS_MAX: 100,
 };

@@ -1,4 +1,4 @@
-import { TRANSACTION_FILTER_LIMITS, TRANSACTION_LIMITS } from '@utils/constants/limits';
+import { DATE_LIMITS, TRANSACTION_FILTER_LIMITS, TRANSACTION_LIMITS } from '@utils/constants/limits';
 import { PaymentMethodEnum } from '@utils/enums/payment-method';
 import { TransactionTypeEnum } from '@utils/enums/transaction-type';
 import { zDate, zDecimal } from '@utils/zod';
@@ -26,18 +26,8 @@ export const TransactionParamsSchema = z.object({
 
 export const TransactionFilterSchema = z
   .object({
-    month: z.coerce
-      .number()
-      .int()
-      .min(TRANSACTION_FILTER_LIMITS.MONTH_MIN)
-      .max(TRANSACTION_FILTER_LIMITS.MONTH_MAX)
-      .optional(),
-    year: z.coerce
-      .number()
-      .int()
-      .min(TRANSACTION_FILTER_LIMITS.YEAR_MIN)
-      .max(TRANSACTION_FILTER_LIMITS.YEAR_MAX)
-      .optional(),
+    month: z.coerce.number().int().min(DATE_LIMITS.MONTH_MIN).max(DATE_LIMITS.MONTH_MAX).optional(),
+    year: z.coerce.number().int().min(DATE_LIMITS.YEAR_MIN).max(DATE_LIMITS.YEAR_MAX).optional(),
     maxResults: z.coerce
       .number()
       .int()

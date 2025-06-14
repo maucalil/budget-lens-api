@@ -1,8 +1,8 @@
-import { Transaction, PrismaClient, Prisma, $Enums } from '@prisma/client';
+import { Transaction, PrismaClient, Prisma, TransactionType } from '@prisma/client';
 import { TransactionCreateInput, TransactionFilter, TransactionUpdateInput } from './transaction.schema';
 import { NotFoundError } from '@utils/errors';
-import { TRANSACTION_FILTER_LIMITS } from '@utils/index';
 import { Decimal } from '@prisma/client/runtime/library';
+import { getDateRange } from '@utils/date';
 
 export class TransactionService {
   constructor(private prisma: PrismaClient) {}
@@ -22,10 +22,11 @@ export class TransactionService {
 
   public async getTransactions(filters?: TransactionFilter): Promise<Transaction[]> {
     const { month, year, maxResults } = filters || {};
-    const { startDate, endDate } = this.getDateRange(month, year);
     const where: Prisma.TransactionWhereInput = {};
 
-    if (startDate && endDate) {
+    if (year) {
+      const { startDate, endDate } = getDateRange(year, month);
+
       where.date = {
         gte: startDate,
         lte: endDate,
@@ -100,25 +101,7 @@ export class TransactionService {
     });
   }
 
-  private getDateRange(month?: number, year?: number): { startDate?: Date; endDate?: Date } {
-    const getStartDate = (y: number, m: number): Date => new Date(y, m - 1, 1);
-    const getEndDate = (y: number, m: number): Date => new Date(y, m, 0);
-
-    if (month && year) {
-      return {
-        startDate: getStartDate(year, month),
-        endDate: getEndDate(year, month),
-      };
-    } else if (year) {
-      return {
-        startDate: getStartDate(year, TRANSACTION_FILTER_LIMITS.MONTH_MIN),
-        endDate: getEndDate(year, TRANSACTION_FILTER_LIMITS.MONTH_MAX),
-      };
-    }
-    return {};
-  }
-
   private getSignedAmount(transaction: Pick<Transaction, 'amount' | 'type'>): Decimal {
-    return transaction.type === $Enums.TransactionType.INCOME ? transaction.amount : transaction.amount.negated();
+    return transaction.type === TransactionType.INCOME ? transaction.amount : transaction.amount.negated();
   }
 }

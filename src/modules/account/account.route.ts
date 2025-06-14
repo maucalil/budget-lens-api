@@ -19,6 +19,7 @@ const accountRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   fastify.get(
     '/',
     {
+      preHandler: [fastify.authenticate],
       schema: {
         tags,
         description: 'List all accounts',
@@ -33,6 +34,7 @@ const accountRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   fastify.get(
     '/:id',
     {
+      preHandler: [fastify.authenticate],
       schema: {
         tags,
         description: 'Get a single account by its ID',
@@ -49,6 +51,7 @@ const accountRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   fastify.post(
     '/',
     {
+      preHandler: [fastify.authenticate],
       schema: {
         tags,
         description: 'Create a new account',
@@ -66,6 +69,7 @@ const accountRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   fastify.put(
     '/:id',
     {
+      preHandler: [fastify.authenticate],
       schema: {
         tags,
         description: 'Update a account by its ID',
@@ -84,6 +88,7 @@ const accountRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   fastify.delete(
     '/:id',
     {
+      preHandler: [fastify.authenticate],
       schema: {
         tags,
         description: 'Delete an account by its ID',

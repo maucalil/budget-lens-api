@@ -20,6 +20,7 @@ const transactionRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) =
   fastify.get(
     '/',
     {
+      preHandler: [fastify.authenticate],
       schema: {
         tags,
         description: 'List all transactions',
@@ -35,6 +36,7 @@ const transactionRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) =
   fastify.get(
     '/:id',
     {
+      preHandler: [fastify.authenticate],
       schema: {
         tags,
         description: 'Get a single transaction by its ID',
@@ -51,6 +53,7 @@ const transactionRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) =
   fastify.post(
     '/',
     {
+      preHandler: [fastify.authenticate],
       schema: {
         tags,
         description: 'Create a transaction',
@@ -68,6 +71,7 @@ const transactionRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) =
   fastify.put(
     '/:id',
     {
+      preHandler: [fastify.authenticate],
       schema: {
         tags,
         description: 'Update a transaction by its ID',
@@ -86,6 +90,7 @@ const transactionRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) =
   fastify.delete(
     '/:id',
     {
+      preHandler: [fastify.authenticate],
       schema: {
         tags,
         description: 'Delete a transaction by its ID',

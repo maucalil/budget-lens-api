@@ -21,7 +21,7 @@ export class AccountService {
     return account;
   }
 
-  public async createAccount(data: AccountCreateInput): Promise<Account> {
+  public async createAccount(data: AccountCreateInput & { userId: number }): Promise<Account> {
     return this.prisma.account.create({ data });
   }
 

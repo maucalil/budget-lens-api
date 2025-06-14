@@ -6,6 +6,7 @@ import prismaPlugin from './prisma';
 import swaggerPlugin from './swagger';
 import errorHandlerPlugin from './error-handler';
 import responseWrapperPlugin from './response-wrapper';
+import authPlugin from './auth';
 
 const plugins: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   await fastify.register(configPlugin);
@@ -15,6 +16,7 @@ const plugins: FastifyPluginAsync = async (fastify: FastifyInstance) => {
     fastify.register(swaggerPlugin),
     fastify.register(errorHandlerPlugin),
     fastify.register(responseWrapperPlugin),
+    fastify.register(authPlugin),
   ]);
 };
 

@@ -30,7 +30,8 @@ export class AccountController {
     request: FastifyRequest<{ Body: AccountCreateInput }>,
     reply: FastifyReply
   ): Promise<void> => {
-    const account = await this.service.createAccount(request.body);
+    const userId = request.user.id;
+    const account = await this.service.createAccount({ ...request.body, userId });
     const parsedAccount = AccountResSchema.parse(account);
     reply.code(201).sendSuccess(parsedAccount);
   };

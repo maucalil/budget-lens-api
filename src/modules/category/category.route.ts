@@ -11,6 +11,7 @@ const categoryRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   fastify.get(
     '/',
     {
+      preHandler: [fastify.authenticate],
       schema: {
         tags: ['Categories'],
         description: 'List all categories',

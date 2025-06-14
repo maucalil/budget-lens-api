@@ -22,15 +22,17 @@ const errorHandlerPlugin: FastifyPluginAsync = async (fastify: FastifyInstance):
     console.log('ERROR CONSTRUCTOR:', error.constructor.name);
     console.log(error);
     if (error instanceof AppError) {
-      if (error.statusCode >= 500) {
-        request.log.error(error);
-      }
-
       reply.status(error.statusCode).send(wrapError(error.message));
       return;
     }
 
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2002') {
+        const target = (error.meta?.target as string[])?.join(', ');
+        reply.status(400).send(wrapError(`Unique constraint failed: ${target} already exists.`));
+        return;
+      }
+
       if (error.code === 'P2003') {
         reply
           .status(400)
@@ -50,6 +52,11 @@ const errorHandlerPlugin: FastifyPluginAsync = async (fastify: FastifyInstance):
         message: issue.message || 'Invalid input',
       }));
       reply.status(400).send(wrapError('Input validation failed', issues));
+      return;
+    }
+
+    if (error.statusCode === 401) {
+      reply.status(401).send(wrapError('Unauthorized: Invalid or expired token'));
       return;
     }
 

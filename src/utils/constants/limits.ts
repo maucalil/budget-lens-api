@@ -5,6 +5,12 @@ export const DATE_LIMITS = {
   YEAR_MAX: 2100,
 };
 
+export const USER_LIMITS = {
+  NAME_MIN_LENGTH: 3,
+  NAME_MAX_LENGTH: 50,
+  PASSWORD_MIN_LENGTH: 6,
+};
+
 export const ACCOUNT_LIMITS = {
   NAME_MIN_LENGTH: 3,
   NAME_MAX_LENGTH: 50,

@@ -12,6 +12,7 @@ const analyticsRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => 
   fastify.get(
     '/cash-flow',
     {
+      preHandler: [fastify.authenticate],
       schema: {
         tags,
         description: 'Get the total income, expenses, and balance for a given month',
@@ -27,6 +28,7 @@ const analyticsRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => 
   fastify.get(
     '/monthly-income-expense',
     {
+      preHandler: [fastify.authenticate],
       schema: {
         tags,
         description:
@@ -43,6 +45,7 @@ const analyticsRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => 
   fastify.get(
     '/expenses-by-category',
     {
+      preHandler: [fastify.authenticate],
       schema: {
         tags,
         description:

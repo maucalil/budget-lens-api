@@ -7,19 +7,6 @@ import { getDateRange } from '@utils/date';
 export class TransactionService {
   constructor(private prisma: PrismaClient) {}
 
-  public async createTransaction(data: TransactionCreateInput): Promise<Transaction> {
-    return await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      const createdTransaction = await tx.transaction.create({ data });
-
-      await tx.account.update({
-        where: { id: createdTransaction.accountId },
-        data: { amount: { increment: this.getSignedAmount(createdTransaction) } },
-      });
-
-      return createdTransaction;
-    });
-  }
-
   public async getTransactions(filters?: TransactionFilter): Promise<Transaction[]> {
     const { month, year, maxResults } = filters || {};
     const where: Prisma.TransactionWhereInput = {};
@@ -48,6 +35,19 @@ export class TransactionService {
     }
 
     return transaction;
+  }
+
+  public async createTransaction(data: TransactionCreateInput): Promise<Transaction> {
+    return await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      const createdTransaction = await tx.transaction.create({ data });
+
+      await tx.account.update({
+        where: { id: createdTransaction.accountId },
+        data: { amount: { increment: this.getSignedAmount(createdTransaction) } },
+      });
+
+      return createdTransaction;
+    });
   }
 
   public async updateTransaction(id: number, data: TransactionUpdateInput): Promise<Transaction> {

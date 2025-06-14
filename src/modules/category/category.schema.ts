@@ -2,14 +2,19 @@ import { CATEGORY_ERRORS } from '@utils/constants/errors';
 import { CATEGORY_LIMITS } from '@utils/constants/limits';
 import { z } from 'zod/v4';
 
-const CategoryCore = {
+const CategoryInput = {
   name: z.string().max(CATEGORY_LIMITS.NAME_MAX_LENGTH, CATEGORY_ERRORS.NAME_MAX_LENGTH),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
 };
 
-const CategorySchema = z.object(CategoryCore);
-export const GetCategoriesResSchema = z.array(CategorySchema);
+const CategoryGenerated = {
+  id: z.number(),
+};
 
-export type GetCategoriesRes = z.infer<typeof GetCategoriesResSchema>;
+export const CategoryResSchema = z.object({
+  ...CategoryGenerated,
+  ...CategoryInput,
+});
+export const CategoriesResSchema = z.array(CategoryResSchema);
 
-z.globalRegistry.add(GetCategoriesResSchema, { id: 'GetCategoriesResSchema' });
+z.globalRegistry.add(CategoriesResSchema, { id: 'CategoriesResSchema' });

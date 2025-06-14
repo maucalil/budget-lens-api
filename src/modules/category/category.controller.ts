@@ -1,11 +1,13 @@
 import { CategoryService } from './category.service';
-import { GetCategoriesRes, GetCategoriesResSchema } from './category.schema';
+import { CategoriesResSchema } from './category.schema';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 export default class CategoryController {
   constructor(private service: CategoryService) {}
 
-  async getCategories(): Promise<GetCategoriesRes> {
+  public getCategories = async (_request: FastifyRequest, reply: FastifyReply): Promise<void> => {
     const categories = await this.service.getCategories();
-    return GetCategoriesResSchema.parse(categories);
-  }
+    const parsedCategories = CategoriesResSchema.parse(categories);
+    reply.code(200).sendSuccess(parsedCategories);
+  };
 }

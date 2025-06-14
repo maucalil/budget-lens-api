@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { TransactionService } from './transaction.service';
 import {
   TransactionCreateInput,
-  TransactionFilterSchema,
+  TransactionFilter,
   TransactionParams,
   TransactionResSchema,
   TransactionsResSchema,
@@ -12,9 +12,11 @@ import {
 export class TransactionController {
   constructor(private service: TransactionService) {}
 
-  public getTransactions = async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
-    const filters = TransactionFilterSchema.parse(request.query);
-    const transactions = await this.service.getTransactions(filters);
+  public getTransactions = async (
+    request: FastifyRequest<{ Querystring: TransactionFilter }>,
+    reply: FastifyReply
+  ): Promise<void> => {
+    const transactions = await this.service.getTransactions(request.query);
     const parsedTransaction = TransactionsResSchema.parse(transactions);
     reply.code(200).sendSuccess(parsedTransaction);
   };

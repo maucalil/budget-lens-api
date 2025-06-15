@@ -1,9 +1,6 @@
 import Fastify, { FastifyInstance, FastifyServerOptions } from 'fastify';
 
-import {
-  serializerCompiler,
-  validatorCompiler,
-} from 'fastify-type-provider-zod';
+import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import plugins from './plugins';
 import modules from './modules';

@@ -13,6 +13,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id Int @id @default(autoincrement())
+  email String @unique
+  name String @db.VarChar(50)
+  password String
+  accounts Account[]
+}
+
 model Account {
   id             Int             @id @default(autoincrement())
   name           String          @db.VarChar(50)
@@ -20,6 +28,8 @@ model Account {
   amount         Decimal         @db.Decimal(10, 2)
   paymentMethods PaymentMethod[]
   transactions   Transaction[]
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         Int
 }
 
 model Category {

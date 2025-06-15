@@ -1,0 +1,31 @@
+export const DATE_LIMITS = {
+  MONTH_MIN: 1,
+  MONTH_MAX: 12,
+  YEAR_MIN: 2020,
+  YEAR_MAX: 2100,
+};
+
+export const USER_LIMITS = {
+  NAME_MIN_LENGTH: 3,
+  NAME_MAX_LENGTH: 50,
+  PASSWORD_MIN_LENGTH: 6,
+};
+
+export const ACCOUNT_LIMITS = {
+  NAME_MIN_LENGTH: 3,
+  NAME_MAX_LENGTH: 50,
+};
+
+export const CATEGORY_LIMITS = {
+  NAME_MAX_LENGTH: 50,
+};
+
+export const TRANSACTION_LIMITS = {
+  NAME_MIN_LENGTH: 3,
+  NAME_MAX_LENGTH: 100,
+};
+
+export const TRANSACTION_FILTER_LIMITS = {
+  RESULTS_MIN: 1,
+  RESULTS_MAX: 100,
+};

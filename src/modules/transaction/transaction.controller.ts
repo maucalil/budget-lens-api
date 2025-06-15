@@ -16,7 +16,7 @@ export class TransactionController {
     request: FastifyRequest<{ Querystring: TransactionFilter }>,
     reply: FastifyReply
   ): Promise<void> => {
-    const transactions = await this.service.getTransactions(request.query);
+    const transactions = await this.service.getTransactions(request.user.id, request.query);
     const parsedTransaction = TransactionsResSchema.parse(transactions);
     reply.code(200).sendSuccess(parsedTransaction);
   };
@@ -26,7 +26,7 @@ export class TransactionController {
     reply: FastifyReply
   ): Promise<void> => {
     const { id } = request.params;
-    const transaction = await this.service.getTransactionById(id);
+    const transaction = await this.service.getTransactionById(id, request.user.id);
     const parsedTransaction = TransactionResSchema.parse(transaction);
     reply.code(200).sendSuccess(parsedTransaction);
   };
@@ -35,7 +35,8 @@ export class TransactionController {
     request: FastifyRequest<{ Body: TransactionCreateInput }>,
     reply: FastifyReply
   ): Promise<void> => {
-    const transaction = await this.service.createTransaction(request.body);
+    const data = { ...request.body, userId: request.user.id };
+    const transaction = await this.service.createTransaction(data);
     const parsedTransaction = TransactionResSchema.parse(transaction);
     reply.code(201).sendSuccess(parsedTransaction);
   };
@@ -48,7 +49,8 @@ export class TransactionController {
     reply: FastifyReply
   ): Promise<void> => {
     const { id } = request.params;
-    const transaction = await this.service.updateTransaction(id, request.body);
+    const data = { ...request.body, userId: request.user.id };
+    const transaction = await this.service.updateTransaction(id, data);
     const parsedTransaction = TransactionResSchema.parse(transaction);
     reply.code(200).sendSuccess(parsedTransaction);
   };
@@ -58,7 +60,7 @@ export class TransactionController {
     reply: FastifyReply
   ): Promise<void> => {
     const { id } = request.params;
-    await this.service.deleteTransaction(id);
+    await this.service.deleteTransaction(id, request.user.id);
     reply.status(204).send();
   };
 }

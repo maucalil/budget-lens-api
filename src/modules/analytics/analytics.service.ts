@@ -18,13 +18,14 @@ type CategoryExpenses = {
 export class AnalyticsService {
   constructor(private prisma: PrismaClient) {}
 
-  public async getCashFlow(query: AnalyticsQuery): Promise<AnalyticsCashFlow> {
+  public async getCashFlow(query: AnalyticsQuery, userId: number): Promise<AnalyticsCashFlow> {
     const { month, year } = query;
     const { startDate, endDate } = getDateRange(year, month);
 
     const result = await this.prisma.transaction.groupBy({
       by: ['type'],
       where: {
+        account: { userId },
         date: {
           gte: startDate,
           lte: endDate,
@@ -52,19 +53,21 @@ export class AnalyticsService {
     return { income, expense, balance };
   }
 
-  public async getMonthlyIncomeExpense(query: AnalyticsQuery): Promise<AnalyticsChart> {
+  public async getMonthlyIncomeExpense(query: AnalyticsQuery, userId: number): Promise<AnalyticsChart> {
     const { month, year } = query;
 
     const result = await this.prisma.$queryRaw<TransactionMonthlyAggreagation[]>(
       Prisma.sql`
         SELECT 
-          EXTRACT(MONTH FROM "date") AS month,
-          "type",
-          SUM("amount")::float AS total
-        FROM "Transaction"
-        WHERE EXTRACT(YEAR FROM "date") = ${year}
-          AND EXTRACT(MONTH FROM "date") <= ${month}
-        GROUP BY month, "type"
+          EXTRACT(MONTH FROM t."date") AS month,
+          t."type" AS type,
+          SUM(t."amount")::float AS total
+        FROM "Transaction" t
+        JOIN "Account" a ON a.id = t."accountId"
+        WHERE a."userId" = ${userId}
+          AND EXTRACT(YEAR FROM t."date") = ${year}
+          AND EXTRACT(MONTH FROM t."date") <= ${month}
+        GROUP BY month, type
         ORDER BY month ASC
       `,
       year,
@@ -74,7 +77,7 @@ export class AnalyticsService {
     return this.buildMonthlyIncomeExpenseChartData(result, year);
   }
 
-  public async getExpensesByCategory(query: AnalyticsQuery): Promise<AnalyticsChart> {
+  public async getExpensesByCategory(query: AnalyticsQuery, userId: number): Promise<AnalyticsChart> {
     const { month, year } = query;
 
     const result = await this.prisma.$queryRaw<CategoryExpenses[]>(
@@ -85,10 +88,12 @@ export class AnalyticsService {
           SUM(t."amount") AS total
         FROM "Transaction" t
         JOIN "Category" c ON c.id = t."categoryId"
-        WHERE t."type" = 'EXPENSE'
+        JOIN "Account" a ON a.id = t."accountId"
+        WHERE a."userId" = ${userId}
+          AND t."type" = 'EXPENSE'
           AND EXTRACT(YEAR FROM t."date") = ${year}
           AND EXTRACT(MONTH FROM t."date") = ${month}
-        GROUP BY c.name, c.color;
+        GROUP BY c.name, c.color
       `,
       year,
       month

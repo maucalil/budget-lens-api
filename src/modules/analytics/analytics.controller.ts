@@ -9,7 +9,7 @@ export class AnalyticsController {
     request: FastifyRequest<{ Querystring: AnalyticsQuery }>,
     reply: FastifyReply
   ): Promise<void> => {
-    const cashFlow = await this.service.getCashFlow(request.query);
+    const cashFlow = await this.service.getCashFlow(request.query, request.user.id);
     const parsedCashFlow = AnalyticsCashFlowSchema.parse(cashFlow);
     reply.code(200).sendSuccess(parsedCashFlow);
   };
@@ -18,7 +18,7 @@ export class AnalyticsController {
     request: FastifyRequest<{ Querystring: AnalyticsQuery }>,
     reply: FastifyReply
   ): Promise<void> => {
-    const monthlyIncomeExpense = await this.service.getMonthlyIncomeExpense(request.query);
+    const monthlyIncomeExpense = await this.service.getMonthlyIncomeExpense(request.query, request.user.id);
     const parsedMonthlyIncomeExpense = AnalyticsChartSchema.parse(monthlyIncomeExpense);
     reply.code(200).sendSuccess(parsedMonthlyIncomeExpense);
   };
@@ -27,7 +27,7 @@ export class AnalyticsController {
     request: FastifyRequest<{ Querystring: AnalyticsQuery }>,
     reply: FastifyReply
   ): Promise<void> => {
-    const expensesByCategory = await this.service.getExpensesByCategory(request.query);
+    const expensesByCategory = await this.service.getExpensesByCategory(request.query, request.user.id);
     const parsedExpensesByCategory = AnalyticsChartSchema.parse(expensesByCategory);
     reply.code(200).sendSuccess(parsedExpensesByCategory);
   };

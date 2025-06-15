@@ -3,21 +3,20 @@ import { TransactionCreateInput, TransactionFilter, TransactionUpdateInput } fro
 import { NotFoundError } from '@utils/errors';
 import { Decimal } from '@prisma/client/runtime/library';
 import { getDateRange } from '@utils/date';
+import { WithUser } from '@utils/types';
 
 export class TransactionService {
   constructor(private prisma: PrismaClient) {}
 
-  public async getTransactions(filters?: TransactionFilter): Promise<Transaction[]> {
+  public async getTransactions(userId: number, filters?: TransactionFilter): Promise<Transaction[]> {
     const { month, year, maxResults } = filters || {};
-    const where: Prisma.TransactionWhereInput = {};
+    const where: Prisma.TransactionWhereInput = {
+      account: { userId },
+    };
 
     if (year) {
       const { startDate, endDate } = getDateRange(year, month);
-
-      where.date = {
-        gte: startDate,
-        lte: endDate,
-      };
+      where.date = { gte: startDate, lte: endDate };
     }
 
     return this.prisma.transaction.findMany({
@@ -27,8 +26,13 @@ export class TransactionService {
     });
   }
 
-  public async getTransactionById(id: number): Promise<Transaction> {
-    const transaction = await this.prisma.transaction.findUnique({ where: { id } });
+  public async getTransactionById(id: number, userId: number): Promise<Transaction> {
+    const transaction = await this.prisma.transaction.findUnique({
+      where: {
+        id,
+        account: { userId },
+      },
+    });
 
     if (!transaction) {
       throw new NotFoundError('Transaction not found.');
@@ -37,27 +41,47 @@ export class TransactionService {
     return transaction;
   }
 
-  public async createTransaction(data: TransactionCreateInput): Promise<Transaction> {
+  public async createTransaction(data: WithUser<TransactionCreateInput>): Promise<Transaction> {
     return await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      const createdTransaction = await tx.transaction.create({ data });
-
-      await tx.account.update({
-        where: { id: createdTransaction.accountId },
-        data: { amount: { increment: this.getSignedAmount(createdTransaction) } },
+      const { accountId, userId, categoryId, ...createData } = data;
+      const createdTransaction = await tx.transaction.create({
+        data: {
+          ...createData,
+          account: { connect: { id: accountId, userId } },
+          category: { connect: { id: categoryId } },
+        },
       });
+
+      await this.updateAccountBalance(tx, createdTransaction.accountId, this.getSignedAmount(createdTransaction));
 
       return createdTransaction;
     });
   }
 
-  public async updateTransaction(id: number, data: TransactionUpdateInput): Promise<Transaction> {
+  public async updateTransaction(id: number, data: WithUser<TransactionUpdateInput>): Promise<Transaction> {
     return await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      const oldTransaction = await tx.transaction.findUnique({ where: { id } });
+      const { accountId, userId, categoryId, ...updateData } = data;
+      const oldTransaction = await tx.transaction.findUnique({
+        where: {
+          id,
+          account: { userId },
+        },
+      });
       if (!oldTransaction) throw new NotFoundError('Transaction to update not found.');
+
+      const updatePayload: Prisma.TransactionUpdateInput = { ...updateData };
+
+      if (accountId) {
+        updatePayload.account = { connect: { id: accountId, userId } };
+      }
+
+      if (categoryId) {
+        updatePayload.category = { connect: { id: categoryId } };
+      }
 
       const updatedTransaction = await tx.transaction.update({
         where: { id },
-        data,
+        data: updatePayload,
       });
 
       const oldAmount = this.getSignedAmount(oldTransaction);
@@ -67,20 +91,9 @@ export class TransactionService {
       const accountUpdates = [];
 
       if (updatedTransaction.accountId !== oldTransaction.accountId) {
-        accountUpdates.push(
-          tx.account.update({
-            where: { id: oldTransaction.accountId },
-            data: { amount: { increment: oldAmount.negated() } },
-          })
-        );
+        accountUpdates.push(this.updateAccountBalance(tx, oldTransaction.accountId, oldAmount.negated()));
       }
-
-      accountUpdates.push(
-        tx.account.update({
-          where: { id: updatedTransaction.accountId },
-          data: { amount: { increment: amountDelta } },
-        })
-      );
+      accountUpdates.push(this.updateAccountBalance(tx, updatedTransaction.accountId, amountDelta));
 
       await Promise.all(accountUpdates);
 
@@ -88,14 +101,20 @@ export class TransactionService {
     });
   }
 
-  public async deleteTransaction(id: number): Promise<Transaction> {
+  public async deleteTransaction(id: number, userId: number): Promise<Transaction> {
     return await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      const deletedTransaction = await tx.transaction.delete({ where: { id } });
-
-      await tx.account.update({
-        where: { id: deletedTransaction.accountId },
-        data: { amount: { increment: this.getSignedAmount(deletedTransaction).negated() } },
+      const deletedTransaction = await tx.transaction.delete({
+        where: {
+          id,
+          account: { userId },
+        },
       });
+
+      await this.updateAccountBalance(
+        tx,
+        deletedTransaction.accountId,
+        this.getSignedAmount(deletedTransaction).negated()
+      );
 
       return deletedTransaction;
     });
@@ -103,5 +122,16 @@ export class TransactionService {
 
   private getSignedAmount(transaction: Pick<Transaction, 'amount' | 'type'>): Decimal {
     return transaction.type === TransactionType.INCOME ? transaction.amount : transaction.amount.negated();
+  }
+
+  private async updateAccountBalance(
+    tx: Prisma.TransactionClient,
+    accountId: number,
+    amountDelta: Prisma.Decimal
+  ): Promise<void> {
+    await tx.account.update({
+      where: { id: accountId },
+      data: { amount: { increment: amountDelta } },
+    });
   }
 }

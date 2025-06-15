@@ -1,7 +1,8 @@
-import { FastifyInstance, FastifyPluginAsync, FastifyReply, FastifyRequest, RouteGenericInterface } from 'fastify';
+import { FastifyInstance, FastifyPluginAsync, FastifyRequest, RouteGenericInterface } from 'fastify';
 import fp from 'fastify-plugin';
 import jwt, { FastifyJWT } from '@fastify/jwt';
 import fastifyCookie from '@fastify/cookie';
+import { UnauthorizedError } from '@utils/errors';
 
 declare module '@fastify/jwt' {
   interface JwtPayload {
@@ -15,7 +16,7 @@ declare module '@fastify/jwt' {
 
 declare module 'fastify' {
   interface FastifyInstance {
-    authenticate: <T extends RouteGenericInterface>(request: FastifyRequest<T>, reply: FastifyReply) => Promise<void>;
+    authenticate: <T extends RouteGenericInterface>(request: FastifyRequest<T>) => Promise<void>;
   }
 }
 
@@ -32,17 +33,17 @@ const authPlugin: FastifyPluginAsync = async (fastify: FastifyInstance) => {
     },
   });
 
-  fastify.decorate('authenticate', async function (request: FastifyRequest, reply: FastifyReply) {
+  fastify.decorate('authenticate', async function (request: FastifyRequest) {
     const token = request.cookies.token;
     if (!token) {
-      return reply.code(401).send({ error: 'Unauthorized: missing token cookie' });
+      throw new UnauthorizedError('Unauthorized: missing token cookie');
     }
 
     try {
       const tokenUser = fastify.jwt.verify<FastifyJWT['user']>(token);
       request.user = tokenUser;
     } catch {
-      return reply.status(401).send({ error: 'Unauthorized: invalid token' });
+      throw new UnauthorizedError('Unauthorized: invalid token');
     }
   });
 };

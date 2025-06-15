@@ -10,6 +10,7 @@ export const configSchema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),
   JWT_SECRET: z.string(),
   JWT_TTL: z.string(),
+  COOKIE_SECRET: z.string(),
 });
 
 type Config = z.infer<typeof configSchema>;

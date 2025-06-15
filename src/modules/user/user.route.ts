@@ -3,6 +3,7 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { UserCreateSchema, UserLoginResSchema, UserLoginSchema, UserResSchema } from './user.schema';
 import { createSuccessResponseSchema } from '@utils/zod';
+import { z } from 'zod/v4';
 
 const userRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   const userService = new UserService(fastify.prisma);
@@ -37,6 +38,21 @@ const userRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
       },
     },
     userController.login
+  );
+
+  fastify.delete(
+    '/logout',
+    {
+      preHandler: [fastify.authenticate],
+      schema: {
+        tags,
+        description: 'Logout user by clearing JWT cookie',
+        response: {
+          200: z.null(),
+        },
+      },
+    },
+    userController.logout
   );
 };
 

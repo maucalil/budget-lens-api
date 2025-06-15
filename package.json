@@ -35,6 +35,7 @@
     "typescript-eslint": "^8.33.1"
   },
   "dependencies": {
+    "@fastify/cookie": "^11.0.2",
     "@fastify/env": "^5.0.2",
     "@fastify/jwt": "^9.1.0",
     "@fastify/swagger": "^9.5.1",

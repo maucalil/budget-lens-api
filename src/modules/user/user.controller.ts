@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { UserService } from './user.service';
-import { UserCreateInput, UserLoginInput, UserLoginResSchema, UserResSchema } from './user.schema';
+import { UserCreateInput, UserLoginInput, UserResSchema } from './user.schema';
 
 export class UserController {
   constructor(private service: UserService) {}
@@ -23,8 +23,7 @@ export class UserController {
       secure: process.env.NODE_ENV === 'prod',
       expires: new Date(Date.now() + 60 * 60 * 1000),
     });
-    const parsedToken = UserLoginResSchema.parse({ token });
-    reply.code(200).sendSuccess(parsedToken);
+    reply.code(200).send();
   };
 
   public logout = async (_request: FastifyRequest, reply: FastifyReply): Promise<void> => {

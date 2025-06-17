@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyPluginAsync } from 'fastify';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { UserCreateSchema, UserLoginResSchema, UserLoginSchema, UserResSchema } from './user.schema';
+import { UserCreateSchema, UserLoginSchema, UserResSchema } from './user.schema';
 import { createSuccessResponseSchema } from '@utils/zod';
 import { z } from 'zod/v4';
 
@@ -30,10 +30,10 @@ const userRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
     {
       schema: {
         tags,
-        description: 'Login user and return JWT token',
+        description: 'Login user',
         body: UserLoginSchema,
         response: {
-          200: createSuccessResponseSchema(UserLoginResSchema),
+          200: z.null(),
         },
       },
     },

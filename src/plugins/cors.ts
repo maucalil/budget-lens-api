@@ -7,6 +7,7 @@ const corsPlugin: FastifyPluginAsync = async (fastify: FastifyInstance) => {
     origin: fastify.config.ALLOWED_ORIGINS.split(',').map(str => str.trim()),
     credentials: true,
     allowedHeaders: ['Content-Type'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   });
 };
 

@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyPluginAsync } from 'fastify';
 import { AnalyticsService } from './analytics.service';
 import { AnalyticsController } from './analytics.controller';
 import { AnalyticsQuerySchema, AnalyticsCashFlowSchema, AnalyticsChartSchema } from './analytics.schema';
-import { createSuccessResponseSchema } from '@utils/zod';
+import { createSuccessResponseSchema, SimpleErrorResponseSchema } from '@utils/zod';
 
 const analyticsRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   const analyticsService = new AnalyticsService(fastify.prisma);
@@ -19,6 +19,7 @@ const analyticsRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => 
         querystring: AnalyticsQuerySchema,
         response: {
           200: createSuccessResponseSchema(AnalyticsCashFlowSchema),
+          401: SimpleErrorResponseSchema,
         },
       },
     },
@@ -36,6 +37,7 @@ const analyticsRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => 
         querystring: AnalyticsQuerySchema,
         response: {
           200: createSuccessResponseSchema(AnalyticsChartSchema),
+          401: SimpleErrorResponseSchema,
         },
       },
     },
@@ -53,6 +55,7 @@ const analyticsRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => 
         querystring: AnalyticsQuerySchema,
         response: {
           200: createSuccessResponseSchema(AnalyticsChartSchema),
+          401: SimpleErrorResponseSchema,
         },
       },
     },

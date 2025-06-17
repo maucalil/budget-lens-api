@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyPluginAsync } from 'fastify';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { UserCreateSchema, UserLoginSchema, UserResSchema } from './user.schema';
-import { createSuccessResponseSchema } from '@utils/zod';
+import { createSuccessResponseSchema, SimpleErrorResponseSchema } from '@utils/zod';
 import { z } from 'zod/v4';
 
 const userRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
@@ -49,10 +49,27 @@ const userRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
         description: 'Logout user by clearing JWT cookie',
         response: {
           200: z.null(),
+          401: SimpleErrorResponseSchema,
         },
       },
     },
     userController.logout
+  );
+
+  fastify.get(
+    '/session',
+    {
+      preHandler: [fastify.authenticate],
+      schema: {
+        tags,
+        description: 'Check session status',
+        response: {
+          200: z.null(),
+          401: SimpleErrorResponseSchema,
+        },
+      },
+    },
+    userController.checkSession
   );
 };
 

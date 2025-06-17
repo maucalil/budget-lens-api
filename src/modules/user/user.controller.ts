@@ -33,4 +33,8 @@ export class UserController {
     });
     reply.code(200).send();
   };
+
+  public checkSession = async (_request: FastifyRequest, reply: FastifyReply): Promise<void> => {
+    reply.code(200).send();
+  };
 }

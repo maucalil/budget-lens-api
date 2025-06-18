@@ -8,6 +8,7 @@ export const configSchema = z.object({
   DATABASE_URL: z.string(),
   HOST: z.string().default('0.0.0.0'),
   PORT: z.coerce.number().int().positive().default(3000),
+  ALLOWED_ORIGINS: z.string(),
   JWT_SECRET: z.string(),
   JWT_TTL: z.string(),
   COOKIE_SECRET: z.string(),

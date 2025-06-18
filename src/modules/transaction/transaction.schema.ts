@@ -1,3 +1,5 @@
+import { AccountResSchema } from '@modules/account/account.schema';
+import { CategoryResSchema } from '@modules/category/category.schema';
 import { DATE_LIMITS, TRANSACTION_FILTER_LIMITS, TRANSACTION_LIMITS } from '@utils/constants/limits';
 import { PaymentMethodEnum } from '@utils/enums/payment-method';
 import { TransactionTypeEnum } from '@utils/enums/transaction-type';
@@ -12,8 +14,6 @@ const TransactionInput = {
   paymentMethod: PaymentMethodEnum,
   accountId: z.number(),
   categoryId: z.number(),
-  // account: ConnectByIdSchema,
-  // category: ConnectByIdSchema,
 };
 
 const TransactionGenerated = {
@@ -40,12 +40,15 @@ export const TransactionFilterSchema = z
     path: ['year'],
   });
 
-export const TransactionCreateSchema = z.object(TransactionInput);
-export const TransactionUpdateSchema = z.object(TransactionInput).partial();
+const TransactionBaseSchema = z.object(TransactionInput);
+export const TransactionCreateSchema = TransactionBaseSchema;
+export const TransactionUpdateSchema = TransactionBaseSchema.partial();
 
 export const TransactionResSchema = z.object({
   ...TransactionGenerated,
-  ...TransactionInput,
+  ...TransactionBaseSchema.omit({ accountId: true, categoryId: true }).shape,
+  account: AccountResSchema,
+  category: CategoryResSchema,
 });
 export const TransactionsResSchema = z.array(TransactionResSchema);
 

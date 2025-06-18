@@ -15,7 +15,7 @@ import { z } from 'zod/v4';
 const transactionRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   const transactionService = new TransactionService(fastify.prisma);
   const transactionController = new TransactionController(transactionService);
-  const tags = ['Transactions'];
+  const tags = ['Transaction'];
 
   fastify.get(
     '/',
@@ -27,6 +27,7 @@ const transactionRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) =
         querystring: TransactionFilterSchema,
         response: {
           200: createSuccessResponseSchema(TransactionsResSchema),
+          401: SimpleErrorResponseSchema,
         },
       },
     },
@@ -43,6 +44,7 @@ const transactionRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) =
         params: TransactionParamsSchema,
         response: {
           200: createSuccessResponseSchema(TransactionResSchema),
+          401: SimpleErrorResponseSchema,
           404: SimpleErrorResponseSchema,
         },
       },
@@ -61,6 +63,7 @@ const transactionRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) =
         response: {
           201: createSuccessResponseSchema(TransactionResSchema),
           400: SimpleErrorResponseSchema,
+          401: SimpleErrorResponseSchema,
           409: SimpleErrorResponseSchema,
         },
       },
@@ -80,6 +83,7 @@ const transactionRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) =
         response: {
           200: createSuccessResponseSchema(TransactionResSchema),
           400: SimpleErrorResponseSchema,
+          401: SimpleErrorResponseSchema,
           404: SimpleErrorResponseSchema,
         },
       },
@@ -97,6 +101,7 @@ const transactionRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) =
         params: TransactionParamsSchema,
         response: {
           204: z.null(),
+          401: SimpleErrorResponseSchema,
           404: SimpleErrorResponseSchema,
         },
       },

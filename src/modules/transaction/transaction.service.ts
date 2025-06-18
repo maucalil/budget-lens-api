@@ -6,6 +6,13 @@ import { getDateRange } from '@utils/date';
 import { WithUser } from '@utils/types';
 
 export class TransactionService {
+  private readonly defaultInclude = {
+    account: {
+      omit: { userId: true },
+    },
+    category: true,
+  };
+
   constructor(private prisma: PrismaClient) {}
 
   public async getTransactions(userId: number, filters?: TransactionFilter): Promise<Transaction[]> {
@@ -23,6 +30,7 @@ export class TransactionService {
       take: maxResults,
       where,
       orderBy: { date: 'desc' },
+      include: this.defaultInclude,
     });
   }
 
@@ -32,6 +40,7 @@ export class TransactionService {
         id,
         account: { userId },
       },
+      include: this.defaultInclude,
     });
 
     if (!transaction) {
@@ -50,6 +59,7 @@ export class TransactionService {
           account: { connect: { id: accountId, userId } },
           category: { connect: { id: categoryId } },
         },
+        include: this.defaultInclude,
       });
 
       await this.updateAccountBalance(tx, createdTransaction.accountId, this.getSignedAmount(createdTransaction));
@@ -82,6 +92,7 @@ export class TransactionService {
       const updatedTransaction = await tx.transaction.update({
         where: { id },
         data: updatePayload,
+        include: this.defaultInclude,
       });
 
       const oldAmount = this.getSignedAmount(oldTransaction);

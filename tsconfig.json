@@ -16,7 +16,8 @@
     "moduleResolution": "node16",
     "baseUrl": ".",
     "paths": {
-      "@utils/*": ["src/utils/*"]
+      "@utils/*": ["src/utils/*"],
+      "@modules/*": ["src/modules/*"]
     }
   }
 }

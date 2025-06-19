@@ -126,13 +126,16 @@ export class AnalyticsService {
       monthMap.set(month, monthData);
     }
 
-    for (const month of monthMap.keys()) {
+    for (let month = 1; month <= 12; month++) {
       labels.push(new Date(year, month - 1).toLocaleString('default', { month: 'short' }));
 
-      const { income, expense } = monthMap.get(month)!;
+      const data = monthMap.get(month) ?? {
+        income: new Decimal(0),
+        expense: new Decimal(0),
+      };
 
-      incomeData.push(income);
-      expenseData.push(expense);
+      incomeData.push(data.income);
+      expenseData.push(data.expense);
     }
 
     return {

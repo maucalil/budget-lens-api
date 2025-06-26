@@ -24,7 +24,6 @@ export const UserResSchema = z
     ...UserInput,
   })
   .omit({ password: true });
-export const UserLoginResSchema = z.object({ token: z.string() });
 
 export type UserCreateInput = z.infer<typeof UserCreateSchema>;
 export type UserLoginInput = z.infer<typeof UserLoginSchema>;
@@ -32,4 +31,3 @@ export type UserLoginInput = z.infer<typeof UserLoginSchema>;
 z.globalRegistry.add(UserCreateSchema, { id: 'UserCreateSchema' });
 z.globalRegistry.add(UserLoginSchema, { id: 'UserLoginSchema' });
 z.globalRegistry.add(UserResSchema, { id: 'UserResSchema' });
-z.globalRegistry.add(UserLoginResSchema, { id: 'UserLoginResSchema' });

@@ -46,7 +46,7 @@ model Transaction {
   date          DateTime        @db.Date
   type          TransactionType
   paymentMethod PaymentMethod
-  account       Account         @relation(fields: [accountId], references: [id])
+  account       Account         @relation(fields: [accountId], references: [id], onDelete: Cascade)
   accountId     Int
   category      Category        @relation(fields: [categoryId], references: [id])
   categoryId    Int

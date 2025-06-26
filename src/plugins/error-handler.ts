@@ -19,8 +19,6 @@ function wrapError(message: string, issues?: unknown[]): ErrorResponse {
 
 const errorHandlerPlugin: FastifyPluginAsync = async (fastify: FastifyInstance): Promise<void> => {
   fastify.setErrorHandler((error: FastifyError, request, reply): void => {
-    console.log('ERROR CONSTRUCTOR:', error.constructor.name);
-    console.log(error);
     if (error instanceof AppError) {
       reply.status(error.statusCode).send(wrapError(error.message));
       return;

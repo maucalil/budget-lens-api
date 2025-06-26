@@ -14,7 +14,7 @@ import { z } from 'zod/v4';
 const accountRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   const accountService = new AccountService(fastify.prisma);
   const accountController = new AccountController(accountService);
-  const tags = ['Accounts'];
+  const tags = ['Account'];
 
   fastify.get(
     '/',
@@ -25,6 +25,7 @@ const accountRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
         description: 'List all accounts',
         response: {
           200: createSuccessResponseSchema(AccountsResSchema),
+          401: SimpleErrorResponseSchema,
         },
       },
     },
@@ -41,6 +42,7 @@ const accountRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
         params: AccountParamsSchema,
         response: {
           200: createSuccessResponseSchema(AccountResSchema),
+          401: SimpleErrorResponseSchema,
           404: SimpleErrorResponseSchema,
         },
       },
@@ -59,6 +61,7 @@ const accountRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
         response: {
           201: createSuccessResponseSchema(AccountResSchema),
           400: SimpleErrorResponseSchema,
+          401: SimpleErrorResponseSchema,
           409: SimpleErrorResponseSchema,
         },
       },
@@ -78,6 +81,7 @@ const accountRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
         response: {
           200: createSuccessResponseSchema(AccountResSchema),
           400: SimpleErrorResponseSchema,
+          401: SimpleErrorResponseSchema,
           404: SimpleErrorResponseSchema,
         },
       },
@@ -95,6 +99,7 @@ const accountRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
         params: AccountParamsSchema,
         response: {
           204: z.null(),
+          401: SimpleErrorResponseSchema,
           404: SimpleErrorResponseSchema,
         },
       },

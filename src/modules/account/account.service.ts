@@ -7,7 +7,10 @@ export class AccountService {
   constructor(private prisma: PrismaClient) {}
 
   public async getAccounts(userId: number): Promise<Account[]> {
-    return this.prisma.account.findMany({ where: { userId } });
+    return this.prisma.account.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+    });
   }
 
   public async getAccountById(id: number, userId: number): Promise<Account> {

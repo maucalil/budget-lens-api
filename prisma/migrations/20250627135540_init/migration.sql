@@ -17,6 +17,7 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Account" (
     "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "name" VARCHAR(50) NOT NULL,
     "color" TEXT NOT NULL,
     "amount" DECIMAL(10,2) NOT NULL,

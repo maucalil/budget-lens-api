@@ -12,7 +12,7 @@ export const USER_LIMITS = {
 };
 
 export const ACCOUNT_LIMITS = {
-  NAME_MIN_LENGTH: 3,
+  NAME_MIN_LENGTH: 2,
   NAME_MAX_LENGTH: 50,
 };
 

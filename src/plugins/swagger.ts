@@ -9,7 +9,8 @@ const swaggerPlugin: FastifyPluginAsync = async (fastify: FastifyInstance) => {
     openapi: {
       info: {
         title: 'BudgetLens Api',
-        description: 'TODO',
+        description:
+          'API de uma aplicação web para controle financeiro pessoal, com funcionalidades de gerenciamento de contas, registro de transações e visualização de dados em um dashboard interativo.',
         version: '1.0.0',
       },
     },
